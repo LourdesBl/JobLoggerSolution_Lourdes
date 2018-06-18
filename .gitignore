@@ -7,3 +7,9 @@
 bin
 obj
 packages
+.vs/JobLogger/DesignTimeBuild/.dtbcache
+.vs/JobLogger/v15/.suo
+.vs/JobLogger/v15/Server/sqlite3/storage.ide
+.vs/JobLogger/v15/Server/sqlite3/storage.ide-shm
+.vs/JobLogger/v15/Server/sqlite3/storage.ide-wal
+JobLogger/packages.config

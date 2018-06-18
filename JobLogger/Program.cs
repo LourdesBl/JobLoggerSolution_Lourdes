@@ -1,54 +1,50 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 
 namespace JobLogger
 {
-	public class Job
-	{
-		public static void Main(string[] args)
-		{
-			var container = ConfigureContainer();
-			var application = container.Resolve<JobLoggerApplication>();
+    public class Job
+    {
+        public static void Main(string[] args)
+        {
+            var container = ConfigureContainer();
+            var application = container.Resolve<JobLoggerApplication>();
 
-			application.Run();
-		}
 
-		private static IContainer ConfigureContainer()
-		{
-			var builder = new ContainerBuilder();
+            application.Run("Error message", true, false, false, true, true, true);
+            application.Run("Warning message", false, true, false, true, true, true);
+            application.Run("Log message", false, false, true, true, true, true);
 
-			// Register all dependencies
-			builder.RegisterType<JobLoggerApplication>().AsSelf();
-			builder.RegisterType<JobLoggerRepository>().As<IJobLoggerRepository>();
-			builder.RegisterType<JobLoggerHelper>().As<IJobLoggerHelper>();
-			
-			return builder.Build();
-		}
-	}
+            //application.Run();
+        }
 
-	public class JobLoggerApplication
-	{
-		private readonly IJobLoggerHelper _jobLoggerHelper;
-		private readonly IJobLoggerRepository _jobLoggerRepository;
+        private static IContainer ConfigureContainer()
+        {
+            var builder = new ContainerBuilder();
 
-		public JobLoggerApplication(IJobLoggerHelper jobLoggerHelper, IJobLoggerRepository jobLoggerRepository)
-		{
-			this._jobLoggerRepository = jobLoggerRepository;
-			this._jobLoggerHelper = jobLoggerHelper;
-		}
-		public void Run()
-		{
-			//var jobLoggerDb = new JobLoggerCore(_jobLoggerHelper, _jobLoggerRepository);
-			//jobLoggerDb.GetFromDb();
+            // Register all dependencies
+            builder.RegisterType<JobLoggerApplication>().AsSelf();
+            builder.RegisterType<JobLoggerRepository>().As<IJobLoggerRepository>();
+            builder.RegisterType<JobLoggerHelper>().As<IJobLoggerHelper>();
+            builder.RegisterType<JobLoggerCore>().As<IJobLoggerCore>();
 
-			var jobLogger = new JobLoggerCore(true, true, true, _jobLoggerHelper, _jobLoggerRepository);
-			jobLogger.LogMessage("Error message", true, false, false);
-			jobLogger.LogMessage("Warning message", false, true, false);
-			jobLogger.LogMessage("Log message", false, false, true);
+            return builder.Build();
+        }
+    }
 
-			Console.ReadLine();
-		}
+    public class JobLoggerApplication
+    {
+        private readonly IJobLoggerCore _jobLoggerCore;
+        public JobLoggerApplication(IJobLoggerCore jobLoggerCore)
+        {
+            this._jobLoggerCore = jobLoggerCore;
+        }
+        public void Run(string logMessage, bool errorMessage, bool warning, bool error, bool logToFile, bool logToConsole, bool logToDatabase)
+        {
+            _jobLoggerCore.LogMessage(logMessage, errorMessage, warning, error, logToFile, logToConsole, logToDatabase);
 
-	}
+            //Console.ReadLine();
+        }
+
+    }
 }
 

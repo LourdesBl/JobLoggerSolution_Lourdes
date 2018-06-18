@@ -10,40 +10,22 @@ namespace JobLogger
 {
 	public class JobLoggerCore : IJobLoggerCore
 	{
-		private readonly bool _logToFile;
-		private readonly bool _logToConsole;
-		private readonly bool _logToDatabase;
-
 		private readonly IJobLoggerHelper _jobLoggerHelper;
-
 		private readonly IJobLoggerRepository _jobLoggerRepository;
-		//private readonly bool _logMessage;
-		//private readonly bool _logWarning;
-		//private readonly bool _logError;
-
-
-		public JobLoggerCore(bool logToFile, bool logToConsole, bool logToDatabase, IJobLoggerHelper jobLoggerHelper, IJobLoggerRepository jobLoggerRepository)
-		{
-			_logToDatabase = logToDatabase;
-			_logToFile = logToFile;
-			_logToConsole = logToConsole;
-			_jobLoggerHelper = jobLoggerHelper;
-			_jobLoggerRepository = jobLoggerRepository;
-		}
-
 		public JobLoggerCore(IJobLoggerHelper jobLoggerHelper, IJobLoggerRepository jobLoggerRepository)
 		{
-			_jobLoggerRepository = jobLoggerRepository;
+			
 			_jobLoggerHelper = jobLoggerHelper;
+			_jobLoggerRepository = jobLoggerRepository;
 		}
-
-		public void LogMessage(string logMessage, bool errorMessage, bool warning, bool error)
+        
+		public void LogMessage(string logMessage, bool errorMessage, bool warning, bool error, bool logToFile, bool logToConsole, bool logToDatabase)
 		{
-			logMessage = logMessage.Trim();
+            logMessage = logMessage.Trim();
 			if (string.IsNullOrEmpty(logMessage))
 				throw new Exception("Empty Message");
 
-			if (!_logToConsole && !_logToFile && !_logToDatabase)
+			if (!logToConsole && !logToFile && !logToDatabase)
 				throw new Exception("Invalid configuration");
 
 			if (!errorMessage && !warning && !error)
@@ -68,7 +50,7 @@ namespace JobLogger
 				consoleColor = ConsoleColor.Yellow;
 			}
 
-			if (_logToDatabase)
+			if (logToDatabase)
 			{
 				var logValue = new LogValue()
 				{
@@ -79,13 +61,13 @@ namespace JobLogger
 			}
 
 			var logMessageTowrite = DateTime.Now.ToShortDateString() + " " + logMessage;
-			if (_logToFile)
+			if (logToFile)
 			{
 				var dateLogName = DateTime.Now.ToShortDateString().Replace("/", "_");
 				_jobLoggerHelper.FileWriteLine(dateLogName, logMessageTowrite);
 			}
 
-			if (_logToConsole)
+			if (logToConsole)
 			{
 				_jobLoggerHelper.WriteConsoleOutput(logMessageTowrite, consoleColor);
 			}
