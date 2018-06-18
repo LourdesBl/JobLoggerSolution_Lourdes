@@ -1,3 +1,9 @@
+*.suo
+[Bb]in/
+[Oo]bj/
+**/[Pp]ackages/*
+
+
 bin
 obj
 packages
